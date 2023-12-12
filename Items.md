@@ -36,19 +36,15 @@ Retorna todos os filhos do item
 
 No xkui os eventos não passam de atributos especiais, os eventos são:
 1. click 
-2. dbclick 
+2. doubleclick 
 3. mousedown
 4. mouseup
 5. mousemove
 6. mouseout
 7. mouseover
-8. keydown
-9. keyup
-10. keypress
 11. focus
 12. blur
 13. change
-14. select
 15. input
 16. load
 17. unload
@@ -58,20 +54,6 @@ No xkui os eventos não passam de atributos especiais, os eventos são:
 21. touchmove
 22. touchend
 23. touchcancel
-24. dragstart
-25. drag
-26. dragenter
-27. dragleave
-28. dragover
-29. drop
-30. dragend
-31. play
-32. pause
-33. ended
-34. canplay
-35. canplaythrough
-36. volumechange
-37. durationchange
 
 ```Array item.attributes``` VCE
 
@@ -120,8 +102,8 @@ Retorna as principais coordenadas do item, as coordenadas são:
 4. scrollScaleY
 5. insertX
 6. insertY
-7. viewportX
-8. viewportY
+7. viewportInsertX
+8. viewportInsertY
 
 ```integer Item.index()``` CET
 
