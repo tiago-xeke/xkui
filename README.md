@@ -12,5 +12,5 @@ Antes de começarmos a apresentar a biblioteca em si, precisamos mostrar algumas
 6. [**SPA**](# "Single Page Application" ), Não é uma regra mas a biblioteca é feita para funcionar melhor com aplicações de Página única
 
 ## Conteúdos
-1. [Biblioteca]("xkui.md") <br/>
-2. [Itens]("Items.md")
+1. [Biblioteca](xkui.md) <br/>
+2. [Itens](Items.md)
