@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+      <head>
+         <meta charset="utf-8">
+         <title>xkui 3.0</title>
+      </head>
+   <body>
+      <div id="root" style="width:100%;height:600px;position:absolute;left:0px;top:0px;background:#000000;overflow:auto"></div>
+
+      <script src="xkui%203.0/xkanalyser.js"></script>
+      <script src="xkui%203.0/xkrender.js"></script>
+      <script src="xkui%203.0/xkcore.js"></script>
+
+      <script>
+         var ui = new xkui();
+         ui.xkeAnalyser.xkaddShortItem("counter");
+         ui.xkeAnalyser.xkaddShortItem("input");
+         ui.setContainer("#root");
+
+         ui.setComponent("counter",function(){
+            var self = this;
+
+            self.attributes = {};
+
+            self.render = function(attributes){
+               self.attributes = attributes;
+
+               return`
+                  <button>${self.attributes.count}</button>
+               `
+            }
+         })
+
+         ui.setView("home",{
+            attributes:{},
+            render:`
+               <counter count=5/>
+            `
+         })
+
+         ui.renderView("home");
+      </script>
+   </body>
+</html>
