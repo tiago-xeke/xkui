@@ -26,11 +26,11 @@
 
 ```void setComponent(string name,function callback)```
 
-- [ ] Atualiza um Componente
+- [x] Atualiza um Componente
 
 ```void deleteComponent(string name)```
 
-- [ ] Deleta um Componente
+- [x] Deleta um Componente
 
 ## Containers
 

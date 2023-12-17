@@ -23,10 +23,14 @@
             self.attributes = {};
 
             self.render = function(attributes){
-               self.attributes = attributes;
+               if(attributes !== undefined){
+                  self.attributes = attributes;
+               }
 
                return`
-                  <button>${self.attributes.count}</button>
+                  <div style="width:200px;height:200px;background:#8800FF">
+                     <button>${self.attributes.count}</button>
+                  </div>
                `
             }
          })

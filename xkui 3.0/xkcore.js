@@ -90,52 +90,117 @@ class xkui{
 				item:this.getView(name)
 			}
 
-			var view = this.view;
+			var viewItem = this.view;
 
-			view.item.hasAttribute = function(name){
-				return view.item.attributes[name] === undefined;
+			viewItem.clone = function(){
+				var clonedView = {
+					name:"clone",
+					items:{
+						name:viewItem.name,type:"component",items:[],item:{}
+					}
+				};
+
+				for(var [dataName,dataValue] of Object.entries(viewItem.item)){
+					clonedView.items.item[dataName] = dataValue;
+				} 
+
+				function scan(container,items){
+					for(var item of items){
+						if(item.type === "component"){
+							var clonedItem = {name:item.name,type:"component",items:[],item:{}};
+
+							for(var [dataName,dataValue] of Object.entries(item.item)){
+								clonedItem.item[dataName] = dataValue;
+							}
+
+							if(item.items.length > 0){
+								scan(clonedItem,item.items);
+							}
+
+							container.items.push(clonedItem);
+						}else if(item.type === "element"){
+							var clonedItem = {name:item.name,type:"element",attributes:{},items:[],item:{}};
+
+							for(var [attributeName,attributeValue] of Object.entries(item.attributes)){
+								clonedItem.attributes[attributeName] = attributeValue;
+							}
+
+							for(var [dataName,dataValue] of Object.entries(item.item)){
+								clonedItem.item[dataName] = dataValue;
+							}
+
+							if(item.items.length > 0){
+								scan(clonedItem,item.items);
+							}
+
+							container.items.push(clonedItem);
+						}else if(item.type === "text"){
+							var clonedItem = {text:item.text,type:"text"};
+
+							container.items.push(clonedItem);
+						}
+					}
+				}
+
+				scan(clonedView.items,viewItem.items);
+
+				return clonedView;
 			}
 
-			view.item.getAttribute = function(name){
-				return view.item.attributes[name];
+			viewItem.clear = function(){
+				function scan(items){
+					for(var item of items){
+						item.delete();
+					}
+				}
+
+				scan(viewItem.items);
 			}
 
-			view.item.deleteAttribute = function(name){
-				delete view.item.attributes[name];
+			viewItem.hasAttribute = function(name){
+				return !(viewItem.item.attributes[name] === undefined);
 			}
 
-			view.item.setAttribute = function(name,value){
-				view.item.attributes[name] = value;
+			viewItem.getAttribute = function(name){
+				return viewItem.item.attributes[name];
 			}
 
-			view.item.toggleAttribute = function(name){
-				var attributeValue = view.item.getAttribute(name);
-
-				view.item.setAttribute(name,!attributeValue);
+			viewItem.deleteAttribute = function(name){
+				delete viewItem.item.attributes[name];
 			}
 
-			view.item.getScroll = function(){
+			viewItem.setAttribute = function(name,value){
+				viewItem.item.attributes[name] = value;
+			}
+
+			viewItem.toggleAttribute = function(name){
+				var attributeValue = viewItem.item.getAttribute(name);
+
+				viewItem.item.setAttribute(name,!attributeValue);
+			}
+
+			viewItem.getScroll = function(){
 				return{
-					insertX:view.container.scrollLeft,
-					insertY:view.container.scrollTop
+					insertX:viewItem.container.scrollLeft,
+					insertY:viewItem.container.scrollTop
 				}
 			}
 
-			view.item.setScroll = function(x,y){
-				view.container.scrollLeft = x;
-				view.container.scrollTop = y;
+			viewItem.setScroll = function(x,y){
+				viewItem.container.scrollLeft = x;
+				viewItem.container.scrollTop = y;
 			}
 
-			view.item.getOffset = function(){
-				var viewport = view.container.getBoundingClientRect();
+			viewItem.getOffset = function(){
+				var viewport = viewItem.container.getBoundingClientRect();
 
 				return{
-					scaleX:view.container.offsetWidth,
-					scaleY:view.container.offsetHeight,
-					scrollScaleX:view.container.scrollWidth,
-					scrollScaleY:view.container.scrollHeight,
-					insertX:view.container.offsetLeft,
-					insertY:view.container.offsetTop,
+					scaleX:viewItem.container.offsetWidth,
+					scaleY:viewItem.container.offsetHeight,
+					scrollScaleX:viewItem.container.scrollWidth,
+					scrollScaleY:viewItem.container.scrollHeight,
+					insertX:viewItem.container.offsetLeft,
+					insertY:viewItem.container.offsetTop,
 					viewportInsertX:viewport.left,
 					viewportInsertY:viewport.top
 				}
@@ -143,16 +208,16 @@ class xkui{
 
 			var viewItems = "";
 
-			if(typeof(view.item.render) === "function"){
-				viewItems = view.item.render();
+			if(typeof(viewItem.item.render) === "function"){
+				viewItems = viewItem.item.render();
 			}else{
-				viewItems = view.item.render;
+				viewItems = viewItem.item.render;
 			}
 
 			var analysedItems = this.xkeAnalyser.xkanalyse(viewItems);
 			var buildedItems = this.xkeAnalyser.xkbuild(analysedItems);
 
-			this.xkeRender.xkrender(view,view.container,buildedItems);
+			this.xkeRender.xkrender(viewItem,viewItem.container,buildedItems);
 		}else{
 			throw "This view do not exists";
 		}
