@@ -95,9 +95,10 @@ class xkui{
 			viewItem.clone = function(){
 				var clonedView = {
 					name:"clone",
-					items:{
+					type:"clone",
+					items:[{
 						name:viewItem.name,type:"component",items:[],item:{}
-					}
+					}]
 				};
 
 				for(var [dataName,dataValue] of Object.entries(viewItem.item)){
@@ -217,7 +218,7 @@ class xkui{
 			var analysedItems = this.xkeAnalyser.xkanalyse(viewItems);
 			var buildedItems = this.xkeAnalyser.xkbuild(analysedItems);
 
-			this.xkeRender.xkrender(viewItem,viewItem.container,buildedItems);
+			this.xkeRender.xkrender(viewItem,viewItem.container,buildedItems,null);
 		}else{
 			throw "This view do not exists";
 		}

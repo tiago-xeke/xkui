@@ -86,7 +86,7 @@ Retorna as principais coordenadas do item, as coordenadas são:
 
 Retorna a posição do item na lista de items filhos de seu Container
 
-- [ ] ```void Item.move(element container)``` CET
+- [x] ```void Item.move(element container)``` CET
 
 Move o item para o novo elemento pai
 
@@ -94,7 +94,7 @@ Move o item para o novo elemento pai
 
 Deleta o item
 
-- [ ] ```void Item.render(string elements,integer index)``` VCE
+- [x] ```void Item.render(string elements,integer index)``` VCE
 
 Renderiza novos elementos no item na posição especificada
 
