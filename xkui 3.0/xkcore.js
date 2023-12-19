@@ -84,129 +84,119 @@ class xkui{
 			this.view = {
 				name:name,
 				type:"view",
-				container:this.getContainer(),
-				path:[this.getContainer()],
+				container:"root",
+				path:["root"],
 				items:[],
-				item:this.getView(name)
+				item:this.getView(name),
+				handle:this.getContainer(),
+				clone:function(){
+					var clonedView = {
+						name:"clone",
+						type:"clone",
+						items:[{
+							name:this.name,type:"component",items:[],item:{}
+						}]
+					};
+
+					for(var [dataName,dataValue] of Object.entries(this.item)){
+						clonedView.items.item[dataName] = dataValue;
+					} 
+
+					function scan(container,items){
+						for(var item of items){
+							if(item.type === "component"){
+								var clonedItem = {name:item.name,type:"component",items:[],item:{}};
+
+								for(var [dataName,dataValue] of Object.entries(item.item)){
+									clonedItem.item[dataName] = dataValue;
+								}
+
+								if(item.items.length > 0){
+									scan(clonedItem,item.items);
+								}
+
+								container.items.push(clonedItem);
+							}else if(item.type === "element"){
+								var clonedItem = {name:item.name,type:"element",attributes:{},items:[],item:{}};
+
+								for(var [attributeName,attributeValue] of Object.entries(item.attributes)){
+									clonedItem.attributes[attributeName] = attributeValue;
+								}
+
+								for(var [dataName,dataValue] of Object.entries(item.item)){
+									clonedItem.item[dataName] = dataValue;
+								}
+
+								if(item.items.length > 0){
+									scan(clonedItem,item.items);
+								}
+
+								container.items.push(clonedItem);
+							}else if(item.type === "text"){
+								var clonedItem = {text:item.text,type:"text"};
+
+								container.items.push(clonedItem);
+							}
+						}
+					}
+
+					scan(clonedView.items,this.items);
+
+					return clonedView;
+				},
+				clear:function(){
+					function scan(items){
+						for(var item of items){
+							item.delete();
+						}
+					}
+
+					scan(this.items);
+				},
+				hasAttribute:function(name){
+					return !(this.item.attributes[name] === undefined);
+				},
+				getAttribute:function(name){
+					return this.item.attributes[name];
+				},
+				deleteAttribute:function(name){
+					delete this.item.attributes[name];
+				},
+				setAttribute:function(name,value){
+					this.item.attributes[name] = value;
+				},
+				toggleAttribute:function(name){
+					var attributeValue = this.item.getAttribute(name);
+
+					this.item.setAttribute(name,!attributeValue);
+				},
+				getScroll:function(){
+					return{
+						insertX:this.container.scrollLeft,
+						insertY:this.container.scrollTop
+					}
+				},
+				setScroll:function(x,y){
+					this.container.scrollLeft = x;
+					this.container.scrollTop = y;
+				},
+				getOffset:function(){
+					var viewport = this.container.getBoundingClientRect();
+
+					return{
+						scaleX:this.container.offsetWidth,
+						scaleY:this.container.offsetHeight,
+						scrollScaleX:this.container.scrollWidth,
+						scrollScaleY:this.container.scrollHeight,
+						insertX:this.container.offsetLeft,
+						insertY:this.container.offsetTop,
+						viewportInsertX:viewport.left,
+						viewportInsertY:viewport.top
+					}
+				}
 			}
 
 			var viewItem = this.view;
-
-			viewItem.clone = function(){
-				var clonedView = {
-					name:"clone",
-					type:"clone",
-					items:[{
-						name:viewItem.name,type:"component",items:[],item:{}
-					}]
-				};
-
-				for(var [dataName,dataValue] of Object.entries(viewItem.item)){
-					clonedView.items.item[dataName] = dataValue;
-				} 
-
-				function scan(container,items){
-					for(var item of items){
-						if(item.type === "component"){
-							var clonedItem = {name:item.name,type:"component",items:[],item:{}};
-
-							for(var [dataName,dataValue] of Object.entries(item.item)){
-								clonedItem.item[dataName] = dataValue;
-							}
-
-							if(item.items.length > 0){
-								scan(clonedItem,item.items);
-							}
-
-							container.items.push(clonedItem);
-						}else if(item.type === "element"){
-							var clonedItem = {name:item.name,type:"element",attributes:{},items:[],item:{}};
-
-							for(var [attributeName,attributeValue] of Object.entries(item.attributes)){
-								clonedItem.attributes[attributeName] = attributeValue;
-							}
-
-							for(var [dataName,dataValue] of Object.entries(item.item)){
-								clonedItem.item[dataName] = dataValue;
-							}
-
-							if(item.items.length > 0){
-								scan(clonedItem,item.items);
-							}
-
-							container.items.push(clonedItem);
-						}else if(item.type === "text"){
-							var clonedItem = {text:item.text,type:"text"};
-
-							container.items.push(clonedItem);
-						}
-					}
-				}
-
-				scan(clonedView.items,viewItem.items);
-
-				return clonedView;
-			}
-
-			viewItem.clear = function(){
-				function scan(items){
-					for(var item of items){
-						item.delete();
-					}
-				}
-
-				scan(viewItem.items);
-			}
-
-			viewItem.hasAttribute = function(name){
-				return !(viewItem.item.attributes[name] === undefined);
-			}
-
-			viewItem.getAttribute = function(name){
-				return viewItem.item.attributes[name];
-			}
-
-			viewItem.deleteAttribute = function(name){
-				delete viewItem.item.attributes[name];
-			}
-
-			viewItem.setAttribute = function(name,value){
-				viewItem.item.attributes[name] = value;
-			}
-
-			viewItem.toggleAttribute = function(name){
-				var attributeValue = viewItem.item.getAttribute(name);
-
-				viewItem.item.setAttribute(name,!attributeValue);
-			}
-
-			viewItem.getScroll = function(){
-				return{
-					insertX:viewItem.container.scrollLeft,
-					insertY:viewItem.container.scrollTop
-				}
-			}
-
-			viewItem.setScroll = function(x,y){
-				viewItem.container.scrollLeft = x;
-				viewItem.container.scrollTop = y;
-			}
-
-			viewItem.getOffset = function(){
-				var viewport = viewItem.container.getBoundingClientRect();
-
-				return{
-					scaleX:viewItem.container.offsetWidth,
-					scaleY:viewItem.container.offsetHeight,
-					scrollScaleX:viewItem.container.scrollWidth,
-					scrollScaleY:viewItem.container.scrollHeight,
-					insertX:viewItem.container.offsetLeft,
-					insertY:viewItem.container.offsetTop,
-					viewportInsertX:viewport.left,
-					viewportInsertY:viewport.top
-				}
-			}
-
 			var viewItems = "";
 
 			if(typeof(viewItem.item.render) === "function"){
@@ -218,7 +208,7 @@ class xkui{
 			var analysedItems = this.xkeAnalyser.xkanalyse(viewItems);
 			var buildedItems = this.xkeAnalyser.xkbuild(analysedItems);
 
-			this.xkeRender.xkrender(viewItem,viewItem.container,buildedItems,null);
+			this.xkeRender.xkrender(viewItem,viewItem.handle,buildedItems,null,false);
 		}else{
 			throw "This view do not exists";
 		}

@@ -285,7 +285,7 @@ var xkeAnalyser = function(){
 
                     var isShort = self.shortItems.includes(items[index01+1].text);
 
-                    addIn.push({name:items[index01+1].text,attributes:[],items:[],type:"tag"});         
+                    addIn.push({name:items[index01+1].text,attributes:[],items:[],type:"element"});         
 
                     var newIndex = analyseTag(index01+1,addIn[addIn.length-1],isShort);
                     index01 = newIndex;
