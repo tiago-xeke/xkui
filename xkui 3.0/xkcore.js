@@ -80,15 +80,27 @@ class xkui{
 	}
 
 	renderView(name){
+		var self = this;
+
 		if(this.hasView(name)){
 			this.view = {
 				name:name,
 				type:"view",
-				container:"root",
 				path:["root"],
+				container:"root",
 				items:[],
 				item:this.getView(name),
 				handle:this.getContainer(),
+				render:function(elements,index){
+					if(typeof(elements) === "string"){
+						var analysedItems = self.xkeAnalyser.xkanalyse(elements);
+					 	var buildedItems = self.xkeAnalyser.xkbuild(analysedItems);
+
+					 	self.xkeRender.xkrender(this,this.handle,buildedItems,index === undefined ? null : index,false);
+					}else{
+						self.xkeRender.xkrender(this,this.handle,elements.items,index === undefined ? null : index,true);
+					}
+				},
 				clone:function(){
 					var clonedView = {
 						name:"clone",

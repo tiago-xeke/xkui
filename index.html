@@ -13,8 +13,12 @@
 
       <script>
          var ui = new xkui();
+         
+         ui.xkeAnalyser.xkaddShortAttribute("open");
+
          ui.xkeAnalyser.xkaddShortItem("counter");
          ui.xkeAnalyser.xkaddShortItem("input");
+
          ui.setContainer("#root");
 
          ui.setComponent("counter",function(){
@@ -29,6 +33,7 @@
 
                return`
                   <div style="width:200px;height:200px;background:#8800FF">
+                     <details open></details>
                      <button>${self.attributes.count}</button>
                   </div>
                `
