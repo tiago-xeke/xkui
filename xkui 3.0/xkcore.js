@@ -184,24 +184,24 @@ class xkui{
 				},
 				getScroll:function(){
 					return{
-						insertX:this.container.scrollLeft,
-						insertY:this.container.scrollTop
+						insertX:this.handle.scrollLeft,
+						insertY:this.handle.scrollTop
 					}
 				},
 				setScroll:function(x,y){
-					this.container.scrollLeft = x;
-					this.container.scrollTop = y;
+					this.handle.scrollLeft = x;
+					this.handle.scrollTop = y;
 				},
 				getOffset:function(){
-					var viewport = this.container.getBoundingClientRect();
+					var viewport = this.handle.getBoundingClientRect();
 
 					return{
-						scaleX:this.container.offsetWidth,
-						scaleY:this.container.offsetHeight,
-						scrollScaleX:this.container.scrollWidth,
-						scrollScaleY:this.container.scrollHeight,
-						insertX:this.container.offsetLeft,
-						insertY:this.container.offsetTop,
+						scaleX:this.handle.offsetWidth,
+						scaleY:this.handle.offsetHeight,
+						scrollScaleX:this.handle.scrollWidth,
+						scrollScaleY:this.handle.scrollHeight,
+						insertX:this.handle.offsetLeft,
+						insertY:this.handle.offsetTop,
 						viewportInsertX:viewport.left,
 						viewportInsertY:viewport.top
 					}
@@ -211,16 +211,22 @@ class xkui{
 			var viewItem = this.view;
 			var viewItems = "";
 
-			if(typeof(viewItem.item.render) === "function"){
-				viewItems = viewItem.item.render();
-			}else{
-				viewItems = viewItem.item.render;
+			viewItem.item = new viewItem.item();
+
+			if(viewItem.item.initializePreRender !== undefined){
+				viewItem.item.initializePreRender();
 			}
+
+			viewItems = viewItem.item.render();
 
 			var analysedItems = this.xkeAnalyser.xkanalyse(viewItems);
 			var buildedItems = this.xkeAnalyser.xkbuild(analysedItems);
 
 			this.xkeRender.xkrender(viewItem,viewItem.handle,buildedItems,null,false);
+
+			if(viewItem.item.initializePostRender !== undefined){
+				viewItem.item.initializePostRender();
+			}
 		}else{
 			throw "This view do not exists";
 		}

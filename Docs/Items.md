@@ -118,33 +118,17 @@ Retorna todos elementos buscados
 
 Estiliza todos os elementos buscados com o estilo especificado, no caso dos elementos apenas eles são estilizados sem a necessidade de queryAll
 
-- [ ] ```void Item.addProperty(string name,function callback or string newName)``` VC
-
-Cria uma nova propriedade para os estilos que se aplicarão a seus items filhos, se o segundo parametro não for uma função, então a propriedade ao invés de "compilada" ela será traduzida para newName
-
 - [ ] ```void Item.setProperty(string name,function callback or string newName)``` VC
 
-Atualiza uma propriedade customizada
-
-- [ ] ```customProperty Item.getProperty(string name)``` VC
-
-Retorna as informações da propriedade customizada
+Cria uma nova propriedade para os estilos que se aplicarão a seus items filhos, se o segundo parametro não for uma função, então a propriedade ao invés de "compilada" ela será traduzida para newName
 
 - [ ] ```void Item.deleteProperty(string name)``` VC
 
 Deleta a propriedade customizada
 
-- [ ] ```void Item.addFunction(string name,function callback)``` VC
-
-Cria uma nova função para ser usada pelos estilos deste item
-
 - [ ] ```void Item.setFunction(string name,function callback)``` VC
 
-Atualiza uma função para ser usada pelos estilos deste item
-
-- [ ] ```customFunction Item.getFunction(string name)``` VC
-
-Retorna as informações de uma função customizada
+Cria uma nova função para ser usada pelos estilos deste item
 
 - [ ] ```customFunction Item.deleteFunction(string name)``` VC
 

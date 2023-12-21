@@ -19,11 +19,15 @@ class xkeRender{
 		for(var item of items){
 			if(update){
 				if(item.type === "component"){
+					if(item.initializePreRender !== undefined){
+						item.initializePreRender();
+					}
+
 					var DOMElement = document.createElement(item.name.split(":")[1]);
 					var VirtualElement = {
 						name:item.name,type:"component",
 						path:[...viewContainer.path,viewContainer],container:viewContainer,
-						item:item.item,handle:DOMElement,items:[],
+						item:{},handle:DOMElement,items:[],
 						render:function(elements,index){
 							if(typeof(elements) === "string"){
 								var analysedItems = self.xkcore.xkeAnalyser.xkanalyse(elements);
@@ -83,12 +87,12 @@ class xkeRender{
 
 							return clonedComponent;
 						},
-						move:function(container){
+						move:function(newContainer){
 							var clone = this.clone();
 
-							this.delete();
+							newContainer.render(clone);
 
-							return clone;
+							this.delete();
 						},
 						index:function(){
 							return this.container.items.indexOf(component);
@@ -107,7 +111,7 @@ class xkeRender{
 								this.finalize();
 							}
 
-							this.clear();
+							this.handle.remove();
 							this.container.items.splice(this.index(),1);
 						},
 						hasAttribute:function(name){
@@ -126,8 +130,36 @@ class xkeRender{
 							var attributeValue = component.item.getAttribute(name);
 
 							component.item.setAttribute(name,!attributeValue);
+						},
+						getScroll:function(){
+							return{
+								insertX:this.handle.scrollLeft,
+								insertY:this.handle.scrollTop
+							}
+						},
+						setScroll:function(x,y){
+							this.handle.scrollLeft = x;
+							this.handle.scrollTop = y;
+						},
+						getOffset:function(){
+							var viewport = this.handle.getBoundingClientRect();
+
+							return{
+								scaleX:this.handle.offsetWidth,
+								scaleY:this.handle.offsetHeight,
+								scrollScaleX:this.handle.scrollWidth,
+								scrollScaleY:this.handle.scrollHeight,
+								insertX:this.handle.offsetLeft,
+								insertY:this.handle.offsetTop,
+								viewportInsertX:viewport.left,
+								viewportInsertY:viewport.top
+							}
 						}
 					};
+
+					for(var [dataName,dataValue] of Object.entries(item.item)){
+						VirtualElement.item[dataName] = dataValue;
+					}
 
 					for(var [attributeName,attributeValue] of Object.entries(VirtualElement.item.attributes)){
 						DOMElement.setAttribute(attributeName,attributeValue);
@@ -148,12 +180,16 @@ class xkeRender{
 					}
 
 					if(item.items.length > 0){
-						this.xkrender(viewContainer.items[index === null ? viewContainer.items.length - 1 : index],DOMElement,item.items,index,true);
+						this.xkrender(viewContainer.items[index === null ? viewContainer.items.length - 1 : index],DOMElement,item.items,null,true);
+					}
+
+					if(item.initializePostRender !== undefined){
+						item.initializePostRender();
 					}
 				}else if(item.type === "element"){
 					var DOMElement = document.createElement(item.name);
 					var VirtualElement = {
-						name:item.name,type:"element",item:{attributes:{}},handle:DOMElement,items:[],
+						name:item.name,type:"element",item:{},handle:DOMElement,items:[],
 						container:viewContainer,path:[...viewContainer.path,viewContainer],
 						render:function(elements,index){
 							if(typeof(elements) === "string"){
@@ -230,6 +266,13 @@ class xkeRender{
 							this.handle.remove();
 							this.container.items.splice(this.index(),1);
 						},
+						move:function(newContainer){
+							var clone = this.clone();
+
+							newContainer.render(clone);
+
+							this.delete();
+						},
 						hasAttribute:function(name){
 							return !(this.item.attributes[name] === undefined);
 						},
@@ -254,12 +297,39 @@ class xkeRender{
 									? this.deleteAttribute(name)
 									: this.setAttribute(name,true);
 							}
+						},
+						getScroll:function(){
+							return{
+								insertX:this.handle.scrollLeft,
+								insertY:this.handle.scrollTop
+							}
+						},
+						setScroll:function(x,y){
+							this.handle.scrollLeft = x;
+							this.handle.scrollTop = y;
+						},
+						getOffset:function(){
+							var viewport = this.handle.getBoundingClientRect();
+
+							return{
+								scaleX:this.handle.offsetWidth,
+								scaleY:this.handle.offsetHeight,
+								scrollScaleX:this.handle.scrollWidth,
+								scrollScaleY:this.handle.scrollHeight,
+								insertX:this.handle.offsetLeft,
+								insertY:this.handle.offsetTop,
+								viewportInsertX:viewport.left,
+								viewportInsertY:viewport.top
+							}
 						}
 					};
 
-					for(var [attributeName,attributeValue] of Object.entries(item.item.attributes)){
+					for(var [dataName,dataValue] of Object.entries(item.item)){
+						VirtualElement.item[dataName] = dataValue;
+					}
+
+					for(var [attributeName,attributeValue] of Object.entries(VirtualElement.item.attributes)){
 						DOMElement.setAttribute(attributeName,attributeValue);
-						VirtualElement.item.attributes[attributeName] = attributeValue;
 					}
 
 					if(index === null){
@@ -301,8 +371,15 @@ class xkeRender{
 								return this.container.items.indexOf(this);
 							},
 							delete:function(){
-								this.item.remove();
+								this.handle.remove();
 								this.container.items.splice(this.index(),1);
+							},
+							move:function(newContainer){
+								var clone = this.clone();
+
+								newContainer.render(clone);
+
+								this.delete();
 							},
 							getText:function(){
 								return this.text;
@@ -420,12 +497,12 @@ class xkeRender{
 
 								return clonedComponent;
 							},
-							move:function(container){
+							move:function(newContainer){
 								var clone = this.clone();
 
-								this.delete();
+								newContainer.render(clone);
 
-								return clone;
+								this.delete();
 							},
 							index:function(){
 								return this.container.items.indexOf(component);
@@ -444,7 +521,7 @@ class xkeRender{
 									this.finalize();
 								}
 
-								this.clear();
+								this.handle.remove();
 								this.container.items.splice(this.index(),1);
 							},
 							hasAttribute:function(name){
@@ -460,9 +537,33 @@ class xkeRender{
 								this.item.attributes[name] = value;
 							},
 							toggleAttribute:function(name){
-								var attributeValue = component.item.getAttribute(name);
+								var attributeValue = this.item.getAttribute(name);
 
-								component.item.setAttribute(name,!attributeValue);
+								this.item.setAttribute(name,!attributeValue);
+							},
+							getScroll:function(){
+								return{
+									insertX:this.handle.scrollLeft,
+									insertY:this.handle.scrollTop
+								}
+							},
+							setScroll:function(x,y){
+								this.handle.scrollLeft = x;
+								this.handle.scrollTop = y;
+							},
+							getOffset:function(){
+								var viewport = this.handle.getBoundingClientRect();
+
+								return{
+									scaleX:this.handle.offsetWidth,
+									scaleY:this.handle.offsetHeight,
+									scrollScaleX:this.handle.scrollWidth,
+									scrollScaleY:this.handle.scrollHeight,
+									insertX:this.handle.offsetLeft,
+									insertY:this.handle.offsetTop,
+									viewportInsertX:viewport.left,
+									viewportInsertY:viewport.top
+								}
 							}
 						};
 
@@ -569,8 +670,15 @@ class xkeRender{
 								scan(this.items);
 							},
 							delete:function(){
-								this.item.remove();
+								this.handle.remove();
 								this.container.items.splice(this.index(),1);
+							},
+							move:function(newContainer){
+								var clone = this.clone();
+
+								newContainer.render(clone);
+
+								this.delete();
 							},
 							hasAttribute:function(name){
 								return !(this.item.attributes[name] === undefined);
@@ -595,6 +703,30 @@ class xkeRender{
 									hasAttribute
 										? this.deleteAttribute(name)
 										: this.setAttribute(name,true);
+								}
+							},
+							getScroll:function(){
+								return{
+									insertX:this.handle.scrollLeft,
+									insertY:this.handle.scrollTop
+								}
+							},
+							setScroll:function(x,y){
+								this.handle.scrollLeft = x;
+								this.handle.scrollTop = y;
+							},
+							getOffset:function(){
+								var viewport = this.handle.getBoundingClientRect();
+
+								return{
+									scaleX:this.handle.offsetWidth,
+									scaleY:this.handle.offsetHeight,
+									scrollScaleX:this.handle.scrollWidth,
+									scrollScaleY:this.handle.scrollHeight,
+									insertX:this.handle.offsetLeft,
+									insertY:this.handle.offsetTop,
+									viewportInsertX:viewport.left,
+									viewportInsertY:viewport.top
 								}
 							}
 						};
@@ -644,8 +776,15 @@ class xkeRender{
 								return this.container.items.indexOf(this);
 							},
 							delete:function(){
-								this.item.remove();
+								this.handle.remove();
 								this.container.items.splice(this.index(),1);
+							},
+							move:function(newContainer){
+								var clone = this.clone();
+
+								newContainer.render(clone);
+
+								this.delete();
 							},
 							getText:function(){
 								return this.text;
@@ -673,7 +812,7 @@ class xkeRender{
 				}
 			}
 
-			index === null ? null : ++index;
+			index === null ? null : index++;
 		}
 	}
 }
