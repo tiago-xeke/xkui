@@ -91,6 +91,70 @@ class xkui{
 				items:[],
 				item:this.getView(name),
 				handle:this.getContainer(),
+				queryAll:function(attribute,value){
+					var returnedItems = [];
+
+					function scan(subItems){
+						for(var subItem of subItems){
+							if(subItem.type === "component" || subItem.type === "element"){
+								if(subItem.hasAttribute(attribute)){
+									if(subItem.getAttribute(attribute) === value){
+										returnedItems.push(subItem);
+									}
+								}
+
+								if(subItem.items.length > 0){
+									scan(subItem.items);
+								}
+							}
+						}
+					}
+
+					scan(this.items);
+
+					return returnedItems;
+				},
+				query:function(attribute,value){
+					var returnedItem;
+
+					function scan(subItems){
+						for(var subItem of subItems){
+							if(subItem.type === "component" || subItem.type === "element"){
+								if(subItem.hasAttribute(attribute)){
+									if(subItem.getAttribute(attribute) === value){
+										returnedItem = subItem;
+										break;
+									}
+								}
+
+								if(subItem.items.length > 0){
+									scan(subItem.items);
+								}
+							}
+						}
+					}
+
+					scan(this.items);
+
+					return returnedItem;
+				},
+				stylize:function(attribute,style){
+					var items = this.queryAll("xklocal::category",attribute);
+
+					items.forEach(function(item){
+						var randomCategory = `item${Math.floor(Math.random() * (100 + 1))}`;
+
+						item.handle.classList.add(randomCategory);
+
+						var styleSheet = document.createElement("style");
+
+						styleSheet.innerHTML = `.${randomCategory}{
+							${style(item)}
+						}`;
+
+						document.head.appendChild(styleSheet);
+					})
+				},
 				render:function(elements,index){
 					if(typeof(elements) === "string"){
 						var analysedItems = self.xkeAnalyser.xkanalyse(elements);
