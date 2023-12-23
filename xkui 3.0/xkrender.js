@@ -122,14 +122,21 @@ class xkeRender{
 						},
 						deleteAttribute:function(name){
 							delete this.item.attributes[name];
+							this.handle.removeAttribute(name);
 						},
 						setAttribute:function(name,value){
 							this.item.attributes[name] = value;
+
+							if(name === "xklocal::category"){
+								return;
+							}
+
+							this.handle.setAttribute(name,value);
 						},
 						toggleAttribute:function(name){
-							var attributeValue = component.item.getAttribute(name);
+							var attributeValue = this.getAttribute(name);
 
-							component.item.setAttribute(name,!attributeValue);
+							this.setAttribute(name,!attributeValue);
 						},
 						getScroll:function(){
 							return{
@@ -162,7 +169,7 @@ class xkeRender{
 					}
 
 					for(var [attributeName,attributeValue] of Object.entries(VirtualElement.item.attributes)){
-						DOMElement.setAttribute(attributeName,attributeValue);
+						VirtualElement.setAttribute(attributeName,attributeValue);
 					}
 
 					if(index === null){
@@ -285,6 +292,11 @@ class xkeRender{
 						},
 						setAttribute:function(name,value){
 							this.item.attributes[name] = value;
+
+							if(name === "xklocal::category"){
+								return;
+							}
+
 							this.handle.setAttribute(name,value);
 						},
 						toggleAttribute:function(name){
@@ -329,7 +341,7 @@ class xkeRender{
 					}
 
 					for(var [attributeName,attributeValue] of Object.entries(VirtualElement.item.attributes)){
-						DOMElement.setAttribute(attributeName,attributeValue);
+						VirtualElement.setAttribute(attributeName,attributeValue);
 					}
 
 					if(index === null){
@@ -408,6 +420,8 @@ class xkeRender{
 			}else{
 				if(item.type === "element"){
 					if(this.xkcore.hasComponent(item.name)){
+						//"component";
+
 						var componentAttributes = {};
 
 						for(var attribute of item.attributes){
@@ -438,6 +452,53 @@ class xkeRender{
 							name:`${item.name}:${mainItem.name}`,type:"component",
 							path:[...viewContainer.path,viewContainer],container:viewContainer,
 							item:component,handle:DOMElement,items:[],
+							queryAll:function(attribute,value){
+								var returnedItems = [];
+
+								function scan(subItems){
+									for(var subItem of subItems){
+										if(subItem.type === "component" || subItem.type === "element"){
+											if(subItem.hasAttribute(attribute)){
+												if(subItem.getAttribute(attribute) === value){
+													returnedItems.push(subItem);
+												}
+											}
+
+											if(subItem.items.length > 0){
+												scan(subItem.items);
+											}
+										}
+									}
+								}
+
+								scan(this.items);
+
+								return returnedItems;
+							},
+							query:function(attribute,value){
+								var returnedItem;
+
+								function scan(subItems){
+									for(var subItem of subItems){
+										if(subItem.type === "component" || subItem.type === "element"){
+											if(subItem.hasAttribute(attribute)){
+												if(subItem.getAttribute(attribute) === value){
+													returnedItem = subItem;
+													break;
+												}
+											}
+
+											if(subItem.items.length > 0){
+												scan(subItem.items);
+											}
+										}
+									}
+								}
+
+								scan(this.items);
+
+								return returnedItem;
+							},
 							render:function(elements,index){
 								if(typeof(elements) === "string"){
 									var analysedItems = self.xkcore.xkeAnalyser.xkanalyse(elements);
@@ -532,14 +593,21 @@ class xkeRender{
 							},
 							deleteAttribute:function(name){
 								delete this.item.attributes[name];
+								this.handle.removeAttribute(name);
 							},
 							setAttribute:function(name,value){
 								this.item.attributes[name] = value;
+
+								if(name === "xklocal::category"){
+									return;
+								}
+
+								this.handle.setAttribute(name,value);
 							},
 							toggleAttribute:function(name){
-								var attributeValue = this.item.getAttribute(name);
+								var attributeValue = this.getAttribute(name);
 
-								this.item.setAttribute(name,!attributeValue);
+								this.setAttribute(name,!attributeValue);
 							},
 							getScroll:function(){
 								return{
@@ -568,8 +636,7 @@ class xkeRender{
 						};
 
 						for(var attribute of mainItem.attributes){
-							DOMElement.setAttribute(attribute.name,attribute.value);
-							VirtualElement.item.attributes[attribute.name] = attribute.value;
+							VirtualElement.setAttribute(attribute.name,attribute.value);
 						}
 
 						if(index === null){
@@ -692,6 +759,11 @@ class xkeRender{
 							},
 							setAttribute:function(name,value){
 								this.item.attributes[name] = value;
+
+								if(name === "xklocal::category"){
+									return;
+								}
+
 								this.handle.setAttribute(name,value);
 							},
 							toggleAttribute:function(name){
@@ -732,8 +804,7 @@ class xkeRender{
 						};
 
 						for(var attribute of item.attributes){
-							DOMElement.setAttribute(attribute.name,attribute.value);
-							VirtualElement.item.attributes[attribute.name] = attribute.value;
+							VirtualElement.setAttribute(attribute.name,attribute.value);
 						}
 
 						if(index === null){

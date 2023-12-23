@@ -67,7 +67,7 @@ var xkeAnalyser = function(){
             for(var index01 = index;index01 < string.length;index01++){
                 if(/[0-9]/.test(string[index01]) == false){
                     addItems([{text:text,type:"number"}]);
-                    return index01;
+                    return index01 - 1;
                 }
 
                 text += string[index01];
@@ -83,21 +83,6 @@ var xkeAnalyser = function(){
                 var char = string[index01];
 
                 if(/[a-z,A-Z,0-9,-,:]/.test(char) == false && !(afterName && isCloseTag)){
-                    if(!afterName){
-                        if(self.ignoreItems.includes(text.toLowerCase()) && self.shortItems.includes(text.toLowerCase()) === false){
-                            isIgnoredItem = true;
-                            ignoredItemName = text.toLowerCase();
-                        }
-                    }
-
-                    addItems([{text:text,type:afterName ? "attribute" : "name"}]);
-
-                    if(afterName == false){
-                        afterName = true;
-                    }
-
-                    text = "";
-                }else if(char === ":" && !(afterName && isCloseTag) && (string[index01 + 1] != ":" && string[index01 - 1] != ":")){
                     if(!afterName){
                         if(self.ignoreItems.includes(text.toLowerCase()) && self.shortItems.includes(text.toLowerCase()) === false){
                             isIgnoredItem = true;
@@ -130,10 +115,6 @@ var xkeAnalyser = function(){
                     continue;
                 }
 
-                if(char == ":" && !(isCloseTag) && (string[index01 + 1] != ":" && string[index01 - 1] != ":")){
-                    addItems([{text:":",type:"equal"}])
-                }
-
                 if(char == "=" && !(isCloseTag)){addItems([{text:"=",type:"equal"}])}
                 if(char == "/" && !(isCloseTag)){addItems([{text:"/",type:"closeBar"}])}
 
@@ -144,14 +125,8 @@ var xkeAnalyser = function(){
                     return newIndex;
                 }
 
-                if(/[a-z,A-Z,0-9,-]/.test(char)){
+                if(/[a-z,A-Z,0-9,-,:]/.test(char)){
                     text += char;
-                }
-
-                if(char === ":"){
-                    if(string[index01 + 1] === ":" || string[index01 - 1] === ":"){
-                        text += char;
-                    }
                 }
             }
         }
