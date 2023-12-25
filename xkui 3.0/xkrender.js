@@ -14,7 +14,9 @@ class xkeRender{
 	}
 
 	xknewComponent(DOMElement,component,item,container){
-		return{
+		var self = this;
+		
+		var itemObject = {
 			name:item.name,type:"component",
 			path:[...container.path,container],container:container,
 			item:component === null ? {} : component,handle:DOMElement,items:[],
@@ -64,6 +66,32 @@ class xkeRender{
 				scan(this.items);
 
 				return returnedItem;
+			},
+			stylize:function(attribute,style){
+				var items = this.queryAll("xklocal::category",attribute);
+
+				items.forEach(function(item){
+					var randomCategory = `item${Math.floor(Math.random() * (100 + 1))}`;
+
+					var analysedItems = self.xkcore.xksAnalyser.xkanalyse(style(item));
+					var buildedItems = self.xkcore.xksAnalyser.xkbuild(analysedItems);
+
+					var styleString = "";
+
+					for(var property of buildedItems){
+						styleString += `${property.name}:${property.value};`;
+					}
+
+					item.handle.classList.add(randomCategory);
+
+					var styleSheet = document.createElement("style");
+
+					styleSheet.innerHTML = `.${randomCategory}{
+						${styleString}
+					}`;
+
+					document.head.appendChild(styleSheet);
+				})
 			},
 			render:function(elements,index){
 				if(typeof(elements) === "string"){
@@ -200,9 +228,14 @@ class xkeRender{
 				}
 			}
 		};
+
+		itemObject.item["handle"] = itemObject;
+		return itemObject;
 	}
 
 	xknewElement(DOMElement,item,container){
+		var self = this;
+
 		return{
 			name:item.name,type:"element",item:{attributes:{}},handle:DOMElement,items:[],
 			container:container,path:[...container.path,container],
@@ -252,6 +285,32 @@ class xkeRender{
 				scan(this.items);
 
 				return returnedItem;
+			},
+			stylize:function(attribute,style){
+				var items = this.queryAll("xklocal::category",attribute);
+
+				items.forEach(function(item){
+					var randomCategory = `item${Math.floor(Math.random() * (100 + 1))}`;
+
+					var analysedItems = self.xkcore.xksAnalyser.xkanalyse(style(item));
+					var buildedItems = self.xkcore.xksAnalyser.xkbuild(analysedItems);
+
+					var styleString = "";
+
+					for(var property of buildedItems){
+						styleString += `${property.name}:${property.value};`;
+					}
+
+					item.handle.classList.add(randomCategory);
+
+					var styleSheet = document.createElement("style");
+
+					styleSheet.innerHTML = `.${randomCategory}{
+						${styleString}
+					}`;
+
+					document.head.appendChild(styleSheet);
+				})
 			},
 			render:function(elements,index){
 				if(typeof(elements) === "string"){
@@ -538,7 +597,7 @@ class xkeRender{
 						var component = new componentPath();
 
 						if(component.initializePreRender !== undefined){
-							component.initializePreRender();
+							component.initializePreRender(componentAttributes);
 						}
 
 						var analysedItems = this.xkcore.xkeAnalyser.xkanalyse(component.render(componentAttributes));

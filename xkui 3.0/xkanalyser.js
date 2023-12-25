@@ -329,7 +329,7 @@ var xksAnalyser = function(){
                     continue;
                 }
 
-                if(/[a-z,A-Z,0-9,#,-]/.test(char)){
+                if(/[a-z,A-Z,0-9,#,-,(,)]/.test(char)){
                     text += char;
                 }
 

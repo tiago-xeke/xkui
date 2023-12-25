@@ -26,17 +26,25 @@
 
             self.attributes = {};
 
-            self.render = function(attributes){
-               if(attributes !== undefined){
-                  self.attributes = attributes;
-               }
+            self.initializePreRender = function(attributes){
+               self.attributes = attributes;
+            }
 
-               return`
-                  <div style="width:200px;height:200px;background:#8800FF">
-                     <button style="color:#0040FF" xklocal::category="classe">${self.attributes.count}</button>
-                     <button style="color:#0040FF" xklocal::category="classe">${self.attributes.count}</button>
-                  </div>
-               `
+            self.render = () => `
+               <div style="width:200px;height:200px;background:#FF0088">
+                  <button xklocal::category="classe">${self.attributes.count}</button>
+                  <button xklocal::category="classe">${self.attributes.count}</button>
+               </div>
+            `
+
+            self.initializePostRender = function(){
+               self.handle.stylize("classe",(item) => `
+                  width:75px
+                  height:75px
+
+                  background:#000000
+                  color:${item.container.handle.style.background}
+               `);
             }
          })
 

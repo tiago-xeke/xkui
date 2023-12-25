@@ -13,6 +13,8 @@ class xkui{
 
 		this.xkeAnalyser = new xkeAnalyser();
 		this.xkeRender = new xkeRender(this);
+
+		this.xksAnalyser = new xksAnalyser();
 	}
 
 	//Containers
@@ -144,12 +146,21 @@ class xkui{
 					items.forEach(function(item){
 						var randomCategory = `item${Math.floor(Math.random() * (100 + 1))}`;
 
+						var analysedItems = self.xksAnalyser.xkanalyse(style(item));
+						var buildedItems = self.xksAnalyser.xkbuild(analysedItems);
+
+						var styleString = "";
+
+						for(var property of buildedItems){
+							styleString += `${property.name}:${property.value};`;
+						}
+
 						item.handle.classList.add(randomCategory);
 
 						var styleSheet = document.createElement("style");
 
 						styleSheet.innerHTML = `.${randomCategory}{
-							${style(item)}
+							${styleString}
 						}`;
 
 						document.head.appendChild(styleSheet);
