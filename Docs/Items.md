@@ -118,13 +118,9 @@ Retorna todos elementos buscados
 
 Estiliza todos os elementos buscados com o estilo especificado, no caso dos elementos apenas eles são estilizados sem a necessidade de queryAll
 
-- [ ] ```void Item.setProperty(string name,function callback or string newName)``` VC
+- [x] ```void Item.setProperty(string name,function callback or string newName)``` VC
 
 Cria uma nova propriedade para os estilos que se aplicarão a seus items filhos, se o segundo parametro não for uma função, então a propriedade ao invés de "compilada" ela será traduzida para newName
-
-- [ ] ```void Item.setFunction(string name,function callback)``` VC
-
-Cria uma nova função para ser usada pelos estilos deste item
 
 ## Procedimentos
 
@@ -136,7 +132,7 @@ Procedimento que é chamado quando o item é iniciado, a função deste procedim
 
 Procedimento que é chamado quando o item é iniciado, um das funções deste procedimento é definir eventos para os elementos filhos
 
-- [ ] ```void Component.item.update()``` VC
+- [x] ```void Component.item.update()``` VC
 
 Procedimento que é chamado quando o item precisa ser atualizado, um das funções deste procedimento é atualizar os estilos dos elementos filhos
 

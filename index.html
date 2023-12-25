@@ -14,36 +14,48 @@
       <script>
          var ui = new xkui();
          
-         ui.xkeAnalyser.xkaddShortAttribute("open");
+         ui.setShortAttribute(["open"]);
+         ui.setShortItem(["counter","input"]);
 
-         ui.xkeAnalyser.xkaddShortItem("counter");
-         ui.xkeAnalyser.xkaddShortItem("input");
+         ui.setProperty("roundness","border-radius");
+         ui.setProperty("size",(values) => `width:${values[0]};height:${values[values.length > 1 ? 1 : 0]}`);
 
          ui.setContainer("#root");
 
          ui.setComponent("counter",function(){
             var self = this;
-
             self.attributes = {};
 
             self.initializePreRender = function(attributes){
                self.attributes = attributes;
             }
 
+            self.decrement = function(){
+               self.attributes.count--;
+               ui.view.query("xklocal::name","mainBtn").setText(self.attributes.count);
+            }
+            self.increment = function(){
+               self.attributes.count++;
+               ui.view.query("xklocal::name","mainBtn").setText(self.attributes.count);
+            }
+
             self.render = () => `
-               <div style="width:200px;height:200px;background:#FF0088">
-                  <button xklocal::category="classe">${self.attributes.count}</button>
-                  <button xklocal::category="classe">${self.attributes.count}</button>
+               <div style="width:225px;height:225px;background:#FF0088">
+                  <button xklocal::category="btn" xkevent::click="decrement">--</button>
+                  <button xklocal::category="btn" xklocal::name="mainBtn">${self.attributes.count}</button>
+                  <button xklocal::category="btn" xkevent::click="increment">++</button>
                </div>
             `
 
-            self.initializePostRender = function(){
-               self.handle.stylize("classe",(item) => `
-                  width:75px
-                  height:75px
+            self.update = function(){
+               ui.view.stylize("btn",(item) => `
+                  cursor:pointer;
 
-                  background:#000000
-                  color:${item.container.handle.style.background}
+                  size:75px;
+                  roundness:5px;
+
+                  background:#000000;
+                  color:${item.container.handle.style.background};
                `);
             }
          })
@@ -51,13 +63,9 @@
          ui.setView("home",function(){
             var self = this;
 
-            self.attributes = {};
-
-            self.render = function(){
-               return`
-                  <counter count=750>
-               `
-            }
+            self.render = () => `
+               <counter count=10>
+            `
          })
 
          ui.renderView("home");

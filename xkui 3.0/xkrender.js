@@ -17,7 +17,7 @@ class xkeRender{
 		var self = this;
 		
 		var itemObject = {
-			name:item.name,type:"component",
+			name:item.name,type:"component",text:"",
 			path:[...container.path,container],container:container,
 			item:component === null ? {} : component,handle:DOMElement,items:[],
 			queryAll:function(attribute,value){
@@ -73,8 +73,7 @@ class xkeRender{
 				items.forEach(function(item){
 					var randomCategory = `item${Math.floor(Math.random() * (100 + 1))}`;
 
-					var analysedItems = self.xkcore.xksAnalyser.xkanalyse(style(item));
-					var buildedItems = self.xkcore.xksAnalyser.xkbuild(analysedItems);
+					var buildedItems = self.xkcore.xksAnalyser.xkshortcut(style(item));
 
 					var styleString = "";
 
@@ -101,6 +100,10 @@ class xkeRender{
 				 	self.xkrender(this,this.handle,buildedItems,index === undefined ? null : index,false);
 				}else{
 					self.xkrender(this,this.handle,elements.items,index === undefined ? null : index,true);
+				}
+
+				if(this.item.update !== undefined){
+					this.item.update();
 				}
 			},
 			clone:function(){
@@ -158,6 +161,10 @@ class xkeRender{
 				newContainer.render(clone);
 
 				this.delete();
+
+				if(this.item.update !== undefined){
+					this.item.update();
+				}
 			},
 			index:function(){
 				return this.container.items.indexOf(component);
@@ -192,8 +199,26 @@ class xkeRender{
 			setAttribute:function(name,value){
 				this.item.attributes[name] = value;
 
-				if(name === "xklocal::category"){
+				if(name === "xklocal::category" || name === "xklocal::name"){
 					return;
+				}else if(name === "xkevent::click"){
+					var closestComponent;
+
+					for(var component of this.path){
+						if(component === this){
+							continue;
+						}
+
+						if(component.type === "component"){
+							closestComponent = component;
+							break;
+						}
+					}
+					if(closestComponent.item[value] !== undefined){
+						this.handle.addEventListener("click",function(){
+							closestComponent.item[value]();
+						});
+					}
 				}
 
 				this.handle.setAttribute(name,value);
@@ -226,6 +251,13 @@ class xkeRender{
 					viewportInsertX:viewport.left,
 					viewportInsertY:viewport.top
 				}
+			},
+			getText:function(){
+				return this.text;
+			},
+			setText:function(newText){
+				this.text = newText;
+				this.handle.textContent = newText;
 			}
 		};
 
@@ -237,7 +269,7 @@ class xkeRender{
 		var self = this;
 
 		return{
-			name:item.name,type:"element",item:{attributes:{}},handle:DOMElement,items:[],
+			name:item.name,type:"element",text:"",item:{attributes:{}},handle:DOMElement,items:[],
 			container:container,path:[...container.path,container],
 			queryAll:function(attribute,value){
 				var returnedItems = [];
@@ -292,8 +324,7 @@ class xkeRender{
 				items.forEach(function(item){
 					var randomCategory = `item${Math.floor(Math.random() * (100 + 1))}`;
 
-					var analysedItems = self.xkcore.xksAnalyser.xkanalyse(style(item));
-					var buildedItems = self.xkcore.xksAnalyser.xkbuild(analysedItems);
+					var buildedItems = self.xkcore.xksAnalyser.xkshortcut(style(item));
 
 					var styleString = "";
 
@@ -320,6 +351,10 @@ class xkeRender{
 				 	self.xkrender(this,this.handle,buildedItems,index === undefined ? null : index,false);
 				}else{
 					self.xkrender(this,this.handle,elements.items,index === undefined ? null : index,true);
+				}
+
+				if(this.item.update !== undefined){
+					this.item.update();
 				}
 			},
 			clone:function(){
@@ -393,6 +428,10 @@ class xkeRender{
 				newContainer.render(clone);
 
 				this.delete();
+
+				if(this.item.update !== undefined){
+					this.item.update();
+				}
 			},
 			hasAttribute:function(name){
 				return !(this.item.attributes[name] === undefined);
@@ -407,8 +446,26 @@ class xkeRender{
 			setAttribute:function(name,value){
 				this.item.attributes[name] = value;
 
-				if(name === "xklocal::category"){
+				if(name === "xklocal::category" || name === "xklocal::name"){
 					return;
+				}else if(name === "xkevent::click"){
+					var closestComponent;
+
+					for(var component of this.path){
+						if(component === this){
+							continue;
+						}
+
+						if(component.type === "component"){
+							closestComponent = component;
+							break;
+						}
+					}
+					if(closestComponent.item[value] !== undefined){
+						this.handle.addEventListener("click",function(){
+							closestComponent.item[value]();
+						});
+					}
 				}
 
 				this.handle.setAttribute(name,value);
@@ -447,6 +504,13 @@ class xkeRender{
 					viewportInsertX:viewport.left,
 					viewportInsertY:viewport.top
 				}
+			},
+			getText:function(){
+				return this.text;
+			},
+			setText:function(newText){
+				this.text = newText;
+				this.handle.textContent = newText;
 			}
 		};
 	}
@@ -532,6 +596,9 @@ class xkeRender{
 
 					if(item.initializePostRender !== undefined){
 						item.initializePostRender();
+					}
+					if(item.update !== undefined){
+						item.update();
 					}
 				}else if(item.type === "element"){
 					var DOMElement = document.createElement(item.name);
@@ -639,6 +706,9 @@ class xkeRender{
 
 						if(component.initializePostRender !== undefined){
 							component.initializePostRender();
+						}
+						if(component.update !== undefined){
+							component.update();
 						}
 					}else{
 						var DOMElement = document.createElement(item.name);

@@ -346,7 +346,7 @@ var xksAnalyser = function(){
                     text = "";
                 }
 
-                if(afterName && char === "\n"){
+                if(afterName && (char === "\n" || char === ";")){
                     addItems([{text:text,type:"propertyValue"}]);
                     return index01;
                 }

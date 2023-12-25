@@ -17,6 +17,30 @@ class xkui{
 		this.xksAnalyser = new xksAnalyser();
 	}
 
+	//Elements
+
+	setShortAttribute(names){
+		for(var name of names){
+			this.xkeAnalyser.xkaddShortAttribute(name);
+		}
+	}
+
+	setShortItem(names){
+		for(var name of names){
+			this.xkeAnalyser.xkaddShortItem(name);
+		}
+	}
+
+	//Styles
+
+	setProperty(name,data){
+		if(typeof(data) === "string"){
+			this.xksAnalyser.xkaddTranspiledProperty(name,data);
+		}else if(typeof(data) === "function"){
+			this.xksAnalyser.xkaddProperty(name,data);
+		}
+	}
+
 	//Containers
 
 	setContainer(container){
@@ -146,8 +170,7 @@ class xkui{
 					items.forEach(function(item){
 						var randomCategory = `item${Math.floor(Math.random() * (100 + 1))}`;
 
-						var analysedItems = self.xksAnalyser.xkanalyse(style(item));
-						var buildedItems = self.xksAnalyser.xkbuild(analysedItems);
+						var buildedItems = self.xksAnalyser.xkshortcut(style(item));
 
 						var styleString = "";
 
