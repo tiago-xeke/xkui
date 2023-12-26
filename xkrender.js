@@ -105,8 +105,8 @@ class xkeRender{
 				if(this.item.update !== undefined){
 					this.item.update();
 				}
-				if(this.xkcore.view.item.update !== undefined){
-					this.xkcore.view.item.update();
+				if(self.xkcore.view.item.update !== undefined){
+					self.xkcore.view.item.update();
 				}
 			},
 			clone:function(){
@@ -190,7 +190,7 @@ class xkeRender{
 				}
 
 				this.handle.remove();
-				this.container.items.splice(this.index(),1);
+				delete this;
 			},
 			hasAttribute:function(name){
 				return !(this.item.attributes[name] === undefined);
@@ -210,7 +210,8 @@ class xkeRender{
 				}else if(name === "xkevent::click"){
 					var closestComponent;
 
-					for(var component of this.path){
+					for(var i = this.path.length - 1;i >= 0;i--){
+						var component = this.path[i];
 						if(component === this){
 							continue;
 						}
@@ -362,8 +363,8 @@ class xkeRender{
 				if(this.item.update !== undefined){
 					this.item.update();
 				}
-				if(this.xkcore.view.item.update !== undefined){
-					this.xkcore.view.item.update();
+				if(self.xkcore.view.item.update !== undefined){
+					self.xkcore.view.item.update();
 				}
 			},
 			clone:function(){
@@ -429,7 +430,7 @@ class xkeRender{
 			},
 			delete:function(){
 				this.handle.remove();
-				this.container.items.splice(this.index(),1);
+				delete this;
 			},
 			move:function(newContainer){
 				var clone = this.clone();
@@ -465,7 +466,9 @@ class xkeRender{
 				}else if(name === "xkevent::click"){
 					var closestComponent;
 
-					for(var component of this.path){
+					for(var i = this.path.length - 1;i >= 0;i--){
+						var component = this.path[i];
+
 						if(component === this){
 							continue;
 						}
@@ -475,6 +478,7 @@ class xkeRender{
 							break;
 						}
 					}
+
 					if(closestComponent.item[value] !== undefined){
 						this.handle.addEventListener("click",function(){
 							closestComponent.item[value](thisItem);
@@ -550,7 +554,7 @@ class xkeRender{
 			},
 			delete:function(){
 				this.handle.remove();
-				this.container.items.splice(this.index(),1);
+				delete this;
 			},
 			move:function(newContainer){
 				var clone = this.clone();
