@@ -463,26 +463,85 @@ class xkeRender{
 
 				if(name === "xklocal::category" || name === "xklocal::name"){
 					return;
-				}else if(name === "xkevent::click"){
-					var closestComponent;
+				}else if(name === "xkinput"){
+					var xkevent = self.xkcore.xkattributeAnalyser.analyse(value);
+					var xkeventArguments = [];
 
-					for(var i = this.path.length - 1;i >= 0;i--){
-						var component = this.path[i];
-
-						if(component === this){
-							continue;
-						}
-
-						if(component.type === "component"){
-							closestComponent = component;
-							break;
+					for(var argument of xkevent.arguments){
+						if(argument.type === "itemPointer"){
+							xkeventArguments.push(this);
+						}else{
+							xkeventArguments.push(argument.text);
 						}
 					}
 
-					if(closestComponent.item[value] !== undefined){
-						this.handle.addEventListener("click",function(){
-							closestComponent.item[value](thisItem);
-						});
+					if(xkevent.target === "application"){
+						if(window[xkevent.functionName] !== undefined){
+							this.handle.addEventListener("input",function(){
+								window[xkevent.functionName](...xkeventArguments);
+							});
+						}
+					}else if(xkevent.target === "component"){
+						var closestComponent;
+
+						for(var i = this.path.length - 1;i >= 0;i--){
+							var component = this.path[i];
+
+							if(component === this){
+								continue;
+							}
+
+							if(component.type === "component"){
+								closestComponent = component;
+								break;
+							}
+						}
+
+						if(closestComponent.item[xkevent.functionName] !== undefined){
+							this.handle.addEventListener("input",function(){
+								closestComponent.item[xkevent.functionName](...xkeventArguments);
+							});
+						}
+					}
+				}else if(name === "xkclick"){
+					var xkevent = self.xkcore.xkattributeAnalyser.analyse(value);
+					var xkeventArguments = [];
+
+					for(var argument of xkevent.arguments){
+						if(argument.type === "itemPointer"){
+							xkeventArguments.push(this);
+						}else{
+							xkeventArguments.push(argument.text);
+						}
+					}
+
+					if(xkevent.target === "application"){
+						if(window[xkevent.functionName] !== undefined){
+							this.handle.addEventListener("click",function(){
+								window[xkevent.functionName](...xkeventArguments);
+							});
+						}
+					}else if(xkevent.target === "component"){
+						var closestComponent;
+
+						for(var i = this.path.length - 1;i >= 0;i--){
+							var component = this.path[i];
+
+							if(component === this){
+								continue;
+							}
+
+							if(component.type === "component"){
+								closestComponent = component;
+								break;
+							}
+						}
+
+						if(closestComponent.item[xkevent.functionName] !== undefined){
+							this.handle.addEventListener("click",function(){
+								closestComponent.item[xkevent.functionName](...xkeventArguments);
+							});
+						}
 					}
 				}
 
@@ -524,7 +583,19 @@ class xkeRender{
 				}
 			},
 			getText:function(){
-				return this.text;
+				function scan(subItems){
+					for(var subItem of subItems){
+						if(subItem.type === "component" || subItem.type === "element"){
+							if(subItem.items.length > 0){
+								return scan(subItem.items);
+							}
+						}else if(subItem.type === "text"){
+							return subItem.text;
+						}
+					}
+				}
+
+				return scan(this.items);
 			},
 			setText:function(newText){
 				this.text = newText;

@@ -10,7 +10,8 @@ class xkui{
 		//XKE - XKElements
 		//XKS - XKStyles
 		//XKC - XKCode
-
+		
+		this.xkattributeAnalyser = new xkattributeAnalyser();
 		this.xkeAnalyser = new xkeAnalyser();
 		this.xkeRender = new xkeRender(this);
 

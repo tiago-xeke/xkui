@@ -428,3 +428,139 @@ var xksAnalyser = function(){
         return transpiledItems;
     }
 }
+
+class xkattributeAnalyser{
+    constructor(){}
+
+    analyse(string){
+        var data = {
+            target:"",
+            functionName:"",
+            arguments:[]
+        },offset = 0;
+
+        if(string.startsWith("application::")){
+            data.target = "application";
+            offset += "application::".length;
+        }else if(string.startsWith("view::")){
+            data.target = "view";
+            offset += "view::".length;
+        }else if(string.startsWith("component::")){
+            data.target = "component";
+            offset += "component::".length;
+        }else{
+            data.target = "application";
+        }
+
+        function analyseNumber(index){
+            var text = "";
+
+           for(var index01 = index;index01 < string.length;index01++){
+                if(/[0-9.-]/.test(string[index01]) === false){
+                    data.arguments.push({
+                        type:"number",
+                        text:Number(text)
+                    })
+                    return index01 - 1;
+                }
+
+                text += string[index01];
+            }
+        }
+
+        function analysePointer(index){
+            var text = "0x";
+
+           for(var index01 = index;index01 < string.length;index01++){
+                if(/[0-9]/.test(string[index01]) === false){
+                    data.arguments.push({
+                        type:"pointer",
+                        text:text
+                    })
+                    return index01 - 1;
+                }
+
+                text += string[index01];
+            }
+        }
+
+        function analyseString(index,quoteType){
+            var text = "";
+
+           for(var index01 = index;index01 < string.length;index01++){
+                if(string[index01] === quoteType){
+                    data.arguments.push({
+                        type:"string",
+                        text:text
+                    })
+                    return index01 + 1;
+                }
+
+                text += string[index01];
+            }
+        }
+
+        var isFunctionName = true;
+
+        for(var index01 = offset;index01 < string.length;index01++){
+            var char = string[index01];
+
+            if(!isFunctionName && (char === "'" || char === '"')){
+                var newIndex = analyseString(index01+1,char);
+                index01 = newIndex;
+                continue;
+            }
+
+            if(!isFunctionName && (char === "0" && string[index01+1].toLowerCase() === "x")){
+                var newIndex = analysePointer(index01+2);
+                index01 = newIndex;
+                continue;
+            }
+
+            if(!isFunctionName && (char === "-" && /[0-9]/.test(string[index01+1])) || (/[0-9]/.test(char))){
+                var newIndex = analyseNumber(index01);
+                index01 = newIndex;
+                continue;
+            }
+
+            if(!isFunctionName && char === "n" && string.indexOf("ull",index01) === index01+1){
+                data.arguments.push({
+                    type:"null",
+                    text:null
+                })
+            }
+
+            if(!isFunctionName && char === "t" && string.indexOf("rue",index01) === index01+1){
+                data.arguments.push({
+                    type:"boolean",
+                    text:true
+                })
+            }
+
+            if(!isFunctionName && char === "f" && string.indexOf("alse",index01) === index01+1){
+                data.arguments.push({
+                    type:"boolean",
+                    text:false
+                })
+            }
+
+            if(!isFunctionName && char === "s" && string.indexOf("elf",index01) === index01+1){
+                data.arguments.push({
+                    type:"itemPointer",
+                    text:"self"
+                })
+            }
+
+            if(isFunctionName && char === "("){
+                isFunctionName = false;
+                continue;
+            }
+
+            if(isFunctionName && /[a-z,A-Z,0-9]/.test(char)){
+                data.functionName += char;
+            }
+        }
+
+        return data;
+    }
+}
